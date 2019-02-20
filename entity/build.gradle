@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+group 'com.theopus'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'com.google.guava', name: 'guava', version: '23.5-jre'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+}

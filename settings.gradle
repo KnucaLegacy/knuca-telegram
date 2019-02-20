@@ -1,0 +1,4 @@
+rootProject.name = 'knuca-telegram'
+include 'backend'
+include 'entity'
+
