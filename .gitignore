@@ -1,3 +1,41 @@
+# Eclipse
+.classpath
+.project
+.metadata
+.checkstyle
+.settings/
+.springBeans
+.checkstyle
+*/bin/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+atlassian-ide-plugin.xml
+out/
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# Gradle
+.gradle/
+build/
+
+# Java
+*.class
+*.jar
+!/storm-topology-components/src/test/resources/jar/TestEncryptor.jar
+*.war
+*.ear
+/build
+/logs
 /build/
-.idea
-.gradle
+classes/
+
+# TestNG
+*/test-output/

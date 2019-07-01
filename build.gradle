@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.5.8.RELEASE'
+        springBootVersion = '1.5.21.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -28,9 +28,11 @@ repositories {
 
 subprojects {
     apply plugin: 'java'
-    
+
     repositories {
         mavenCentral()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
     }
 }
 

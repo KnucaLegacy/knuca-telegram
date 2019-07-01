@@ -1,0 +1,14 @@
+dependencies {
+    compile group: 'org.apache.lucene', name: 'lucene-core', version: '7.6.0'
+    compile group: 'org.apache.lucene', name: 'lucene-queryparser', version: '7.6.0'
+    compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '7.6.0'
+    compile group: 'org.firebirdsql.jdbc', name: 'jaybird-jdk18', version: '3.0.6'
+    compile("org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}")
+
+    compile group: 'com.esotericsoftware', name: 'kryo', version: '4.0.0'
+
+
+    compile project(":entity")
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
