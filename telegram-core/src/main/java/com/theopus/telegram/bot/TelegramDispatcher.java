@@ -80,19 +80,27 @@ public class TelegramDispatcher {
         String msg = req.getOriginalMessage();
         Matcher commandMatcher = commandPattern.matcher(msg);
         int commandStart;
+        boolean containsCommand;
         if (commandMatcher.find()) {
             commandStart = commandMatcher.start();
             req.setCommand(commandMatcher.group(2))
                     .setData(msg.substring(commandMatcher.end()).trim());
+            containsCommand = true;
         } else {
             commandStart = msg.length() - 1;
             req.setData(msg);
+            containsCommand = false;
         }
 
         Matcher mentionMatcher = mentionPattern.matcher(msg.substring(0, commandStart));
+        int mentionEnd = 0;
         while (mentionMatcher.find()) {
             String mention = mentionMatcher.group(2);
             req.addMention(mention);
+            mentionEnd = mentionMatcher.end();
+        }
+        if (!containsCommand && mentionEnd != 0){
+            req.setData(req.getData().substring(mentionEnd).trim());
         }
     }
 

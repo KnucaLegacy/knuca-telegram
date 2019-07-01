@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import com.theopus.schedule.backend.configuration.RepositoryConfiguration;
+import com.theopus.schedule.backend.service.LessonService;
 import com.theopus.schedule.rest.controller.GroupController;
 import com.theopus.schedule.rest.controller.LessonController;
 import com.theopus.schedule.rest.controller.RestExceptionHandler;
@@ -46,9 +47,9 @@ public class ScheduleRestConfiguration {
     public LessonController lcontroller(Repository<Group> grepository,
                                         Repository<Teacher> trepository,
                                         Repository<Room> rrepository,
-                                        LessonRepository lessonRepository
+                                        LessonService service
     ) {
-        return new LessonController(lessonRepository, grepository, trepository, rrepository);
+        return new LessonController(service, grepository, trepository, rrepository);
     }
 
 }

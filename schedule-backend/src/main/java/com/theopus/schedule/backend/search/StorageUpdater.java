@@ -1,6 +1,7 @@
 package com.theopus.schedule.backend.search;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +27,30 @@ public class StorageUpdater {
         process();
     }
 
-    public void process() throws IOException {
-        storage.storeGroups(groups.all());
-        storage.storeTeachers(teachers.all());
-        storage.storeRooms(rooms.all());
+    public void process() {
+        try {
+            LOGGER.info("Updating storage...");
+            storage.emptyWrite();
+
+            List<Group> groupsQ = groups.all();
+            LOGGER.info("Queried groups {}", groupsQ.size());
+            storage.storeGroups(groupsQ);
+            LOGGER.info("Stored groups.");
+
+            List<Teacher> teachersQ = teachers.all();
+            LOGGER.info("Queried teachers {}", teachersQ.size());
+            storage.storeTeachers(teachersQ);
+            LOGGER.info("Stored teachers.");
+            List<Room> roomQ = rooms.all();
+            LOGGER.info("Queried teachers {}", roomQ.size());
+            storage.storeRooms(roomQ);
+            LOGGER.info("Stored rooms.");
+            LOGGER.info("Finished updating.");
+            storage.swap();
+        } catch (IOException e) {
+            LOGGER.error("{}",e);
+            throw new RuntimeException(e);
+        }
     }
 
 }

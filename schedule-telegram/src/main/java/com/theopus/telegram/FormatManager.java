@@ -3,10 +3,14 @@ package com.theopus.telegram;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
+import com.theopus.entity.schedule.Room;
 import com.theopus.entity.schedule.enums.LessonOrder;
 import com.theopus.entity.schedule.enums.LessonType;
+import com.theopus.telegram.handler.entity.ScheduleCommandData;
 
 public class FormatManager {
 
@@ -30,6 +34,13 @@ public class FormatManager {
             .put(LessonType.FACULTY, "Факультатив")
             .build();
 
+    private ImmutableMap<ScheduleCommandData.Action, String> actions = new ImmutableMap.Builder<ScheduleCommandData.Action, String>()
+            .put(ScheduleCommandData.Action.TODAY, "Сегодня")
+            .put(ScheduleCommandData.Action.TOMORROW, "Завтра")
+            .put(ScheduleCommandData.Action.WEEK, "Неделя")
+            .put(ScheduleCommandData.Action.NEXT_WEEK, "След. Неделя")
+            .build();
+
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE - dd/MM/yyyy", new Locale("ru", "RU"));
 
     public String format(LessonOrder order) {
@@ -43,5 +54,13 @@ public class FormatManager {
     public String formatWithDow(LocalDate day) {
         String result = formatter.format(day);
         return result.replace(String.valueOf(result.charAt(0)), String.valueOf(result.charAt(0)).toUpperCase());
+    }
+
+    public String format(Set<Room> rooms) {
+        return rooms.stream().map(Room::getName).map(s -> "ауд. " + s).collect(Collectors.joining(", "));
+    }
+
+    public String format(ScheduleCommandData.Action action) {
+        return actions.get(action);
     }
 }

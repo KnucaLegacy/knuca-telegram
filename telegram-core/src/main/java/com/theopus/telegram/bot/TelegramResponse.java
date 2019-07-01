@@ -31,6 +31,11 @@ public class TelegramResponse {
         return response;
     }
 
+    public TelegramResponse addButtons(List<InlineKeyboardButton> buttons) {
+        this.buttons.addAll(buttons);
+        return this;
+    }
+
     public static TelegramResponse ofRaw(String body) {
         TelegramResponse response = new TelegramResponse();
         response.addRaw(body);
@@ -60,7 +65,7 @@ public class TelegramResponse {
         return "TelegramResponse{" +
                 "status=" + status +
                 ", buttons=" + buttons +
-                ", body='" + body + '\'' +
+//                ", body='" + body + '\'' +
                 ", markup=" + markup +
                 ", next=" + next +
                 '}';
@@ -72,7 +77,7 @@ public class TelegramResponse {
 
     public TelegramResponse append() {
         TelegramResponse response = new TelegramResponse();
-        TelegramResponse last = last();
+        TelegramResponse last = this.last();
         last.next = response;
         last.next.head = last.head == null ? last : last.head;
         return response;
@@ -82,12 +87,12 @@ public class TelegramResponse {
         if (this.next == null) {
             return this;
         } else {
-            return this.last();
+            return this.next.last();
         }
     }
 
     public TelegramResponse head() {
-        return head;
+        return this.head != null ? this.head : this;
     }
 
     public TelegramResponse next() {
@@ -106,6 +111,7 @@ public class TelegramResponse {
     }
 
     public String getBold(String text) {
+        markup = true;
         return "<b>" + text + "</b>";
     }
 

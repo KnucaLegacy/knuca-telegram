@@ -24,20 +24,20 @@ import com.theopus.entity.schedule.Group;
 import com.theopus.entity.schedule.Lesson;
 import com.theopus.entity.schedule.Room;
 import com.theopus.entity.schedule.Teacher;
-import com.theopus.schedule.backend.repository.LessonRepository;
 import com.theopus.schedule.backend.repository.Repository;
+import com.theopus.schedule.backend.service.LessonService;
 
 @RestController
 @RequestMapping("/lessons")
 public class LessonController {
 
-    private LessonRepository service;
+    private LessonService service;
     private Repository<Group> groupService;
     private Repository<Teacher> teacherService;
     private Repository<Room> roomService;
 
     @Autowired
-    public LessonController(LessonRepository service, Repository<Group> groupService, Repository<Teacher> teacherService, Repository<Room> roomService) {
+    public LessonController(LessonService service, Repository<Group> groupService, Repository<Teacher> teacherService, Repository<Room> roomService) {
         this.service = service;
         this.groupService = groupService;
         this.teacherService = teacherService;
@@ -46,72 +46,66 @@ public class LessonController {
 
     @GetMapping("/group/{id}")
     public ResponseEntity<List<Lesson>> byGroup(@PathVariable Long id) {
-        return ResponseEntity.ok(service.byGroup(group(id), LocalDate.now()));
+        return ResponseEntity.ok(check(service.at(id, LocalDate.now(), Group.class), id));
     }
 
     @GetMapping("/{yyyy-MM-dd}/group/{id}")
     public ResponseEntity<List<Lesson>> byGroupAndDate(@PathVariable Long id, @PathVariable("yyyy-MM-dd") LocalDate localDate) {
-        return ResponseEntity.ok(service.byGroup(group(id), localDate));
+        return ResponseEntity.ok(check(service.at(id, localDate, Group.class), id));
     }
 
     @GetMapping("/teacher/{id}")
     public ResponseEntity<List<Lesson>> byTeacher(@PathVariable Long id) {
-        return ResponseEntity.ok(service.byTeacher(teacher(id), LocalDate.now()));
+        return ResponseEntity.ok(check(service.at(id, LocalDate.now(), Teacher.class), id));
     }
 
     @GetMapping("/{yyyy-MM-dd}/teacher/{id}")
     public ResponseEntity<List<Lesson>> byTeacherAndDate(@PathVariable Long id, @PathVariable("yyyy-MM-dd") LocalDate localDate) {
-        return ResponseEntity.ok(service.byTeacher(teacher(id), localDate));
+        return ResponseEntity.ok(check(service.at(id, localDate, Teacher.class), id));
     }
 
     @GetMapping("/room/{id}")
     public ResponseEntity<List<Lesson>> byRoom(@PathVariable Long id) {
-        return ResponseEntity.ok(service.byRoom(room(id), LocalDate.now()));
+        return ResponseEntity.ok(check(service.at(id, LocalDate.now(), Room.class), id));
     }
 
     @GetMapping("/{yyyy-MM-dd}/room/{id}")
     public ResponseEntity<List<Lesson>> byRoomAndDate(@PathVariable Long id, @PathVariable("yyyy-MM-dd") LocalDate localDate) {
-        return ResponseEntity.ok(service.byRoom(room(id), localDate));
+        return ResponseEntity.ok(check(service.at(id, localDate, Room.class), id));
     }
 
     @GetMapping("/week/room/{id}")
     public ResponseEntity<Map<LocalDate, List<Lesson>>> byRoomAndWeek(@PathVariable Long id) {
-        ImmutablePair<LocalDate, LocalDate> week = weekFromTo(LocalDate.now());
-        return ResponseEntity.ok(service.byRoom(room(id), week.left, week.right));
+        return ResponseEntity.ok(check(service.week(id, Room.class), id));
     }
 
     @GetMapping("/week/group/{id}")
     public ResponseEntity<Map<LocalDate, List<Lesson>>> byGroupAndWeek(@PathVariable Long id) {
-        ImmutablePair<LocalDate, LocalDate> week = weekFromTo(LocalDate.now());
-        Map<LocalDate, List<Lesson>> body = service.byGroup(group(id), week.left, week.right);
+        Map<LocalDate, List<Lesson>> body = check(service.week(id, Group.class), id);
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/week/teacher/{id}")
     public ResponseEntity<Map<LocalDate, List<Lesson>>> byTeacherAndWeek(@PathVariable Long id) {
-        ImmutablePair<LocalDate, LocalDate> week = weekFromTo(LocalDate.now());
-        return ResponseEntity.ok(service.byTeacher(teacher(id), week.left, week.right));
+        return ResponseEntity.ok(check(service.week(id, Group.class), id));
     }
 
     @GetMapping("/week/{offset}/room/{id}")
     public ResponseEntity<Map<LocalDate, List<Lesson>>> byRoomAndWeekOffset(@PathVariable Integer offset,
                                                                             @PathVariable Long id) {
-        ImmutablePair<LocalDate, LocalDate> week = weekFromTo(LocalDate.now(), offset);
-        return ResponseEntity.ok(service.byRoom(room(id), week.left, week.right));
+        return ResponseEntity.ok(check(service.week(id, offset, Room.class), id));
     }
 
     @GetMapping("/week/{offset}/group/{id}")
     public ResponseEntity<Map<LocalDate, List<Lesson>>> byGroupAndDateOffset(@PathVariable Integer offset,
                                                                              @PathVariable Long id) {
-        ImmutablePair<LocalDate, LocalDate> week = weekFromTo(LocalDate.now(), offset);
-        return ResponseEntity.ok(service.byGroup(group(id), week.left, week.right));
+        return ResponseEntity.ok(check(service.week(id, offset, Group.class), id));
     }
 
     @GetMapping("/week/{offset}/teacher/{id}")
     public ResponseEntity<Map<LocalDate, List<Lesson>>> byTeacherAndWeekOffset(@PathVariable Integer offset,
                                                                                @PathVariable Long id) {
-        ImmutablePair<LocalDate, LocalDate> week = weekFromTo(LocalDate.now(), offset);
-        return ResponseEntity.ok(service.byTeacher(teacher(id), week.left, week.right));
+        return ResponseEntity.ok(check(service.week(id, offset, Teacher.class), id));
     }
 
     @GetMapping("/range/room/{id}")
@@ -119,7 +113,7 @@ public class LessonController {
             @RequestParam(name = "from", required = true) LocalDate from,
             @RequestParam(name = "fo", required = true) LocalDate to,
             @PathVariable Long id) {
-        return ResponseEntity.ok(service.byRoom(room(id), from, to));
+        return ResponseEntity.ok(check(service.range(id, from, to, Room.class), id));
     }
 
     @GetMapping("/range/group/{id}")
@@ -127,7 +121,7 @@ public class LessonController {
             @RequestParam(name = "from", required = true) LocalDate from,
             @RequestParam(name = "fo", required = true) LocalDate to,
             @PathVariable Long id) {
-        return ResponseEntity.ok(service.byGroup(group(id), from, to));
+        return ResponseEntity.ok(check(service.range(id, from, to, Group.class), id));
     }
 
     @GetMapping("/range/teacher/{id}")
@@ -135,49 +129,14 @@ public class LessonController {
             @RequestParam(name = "from", required = true) LocalDate from,
             @RequestParam(name = "fo", required = true) LocalDate to,
             @PathVariable Long id) {
-        return ResponseEntity.ok(service.byTeacher(teacher(id), from, to));
+        return ResponseEntity.ok(check(service.range(id, from, to, Room.class), id));
     }
 
-    private Room room(Long id) {
-        Room room = roomService.get(id);
-        if (Objects.isNull(room)) {
+    private <T, U> U check(ImmutablePair<T, U> pair, Long id) {
+        if (Objects.isNull(pair.left)) {
             throw new EntityNotFoundException("Not found Room with id " + id);
+        } else {
+            return pair.right;
         }
-        return room;
-    }
-
-    private Teacher teacher(Long id) {
-        Teacher teacher = teacherService.get(id);
-        if (Objects.isNull(teacher)) {
-            throw new EntityNotFoundException("Not found Teacher with id " + id);
-        }
-        return teacher;
-    }
-
-    private Group group(Long id) {
-        Group group = groupService.get(id);
-        if (Objects.isNull(group)) {
-            throw new EntityNotFoundException("Not found Group with id " + id);
-        }
-        return group;
-    }
-
-    private static ImmutablePair<LocalDate, LocalDate> weekFromTo(LocalDate localDate) {
-        return weekFromTo(localDate, 0);
-    }
-
-    private static ImmutablePair<LocalDate, LocalDate> weekFromTo(LocalDate localDate, int offset) {
-        LocalDate newDate = localDate.plusDays(7 * offset);
-        return ImmutablePair.of(
-                newDate.with(DayOfWeek.MONDAY),
-                newDate.with(DayOfWeek.SUNDAY)
-        );
-    }
-
-
-    private static Set<LocalDate> range(LocalDate from, LocalDate to) {
-        final int days = (int) from.until(to, ChronoUnit.DAYS);
-        return Stream.iterate(from, d -> d.plusDays(1))
-                .limit(days).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

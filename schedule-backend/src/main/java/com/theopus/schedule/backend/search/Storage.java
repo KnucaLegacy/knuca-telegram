@@ -30,31 +30,74 @@ import com.theopus.entity.schedule.Teacher;
 
 public class Storage {
 
-    private final Directory directory;
-    private final IndexWriter writer;
+    private final RussianAnalyzer analyzer;
+    private Directory writeDirectory;
+    private Directory readDirectory;
+    private IndexWriter writer;
     private final QueryParser queryParser;
     private IndexReader reader;
     private IndexSearcher searcher;
 
     public Storage() throws IOException {
-        this.directory = new RAMDirectory();
-        RussianAnalyzer analyzer = new RussianAnalyzer();
-        IndexWriterConfig conf = new IndexWriterConfig(analyzer);
-        this.writer = new IndexWriter(directory, conf);
-        writer.commit();
-        this.reader = DirectoryReader.open(directory);
-        this.searcher = new IndexSearcher(reader);
-        this.queryParser = new QueryParser("name", new RussianAnalyzer());
+        //final
+        analyzer = new RussianAnalyzer();
+        queryParser = new QueryParser("name", analyzer);
         queryParser.setAllowLeadingWildcard(true);
 
+        this.readDirectory = new RAMDirectory();
+        IndexWriter touch = new IndexWriter(readDirectory, config());
+        //pre touch
+        touch.commit();
+        touch.flush();
+        touch.close();
+
+        this.writeDirectory = new RAMDirectory();
+        init();
     }
+
+    private IndexWriterConfig config() {
+        return new IndexWriterConfig(analyzer);
+    }
+
+    public void emptyWrite() throws IOException {
+        this.writeDirectory.close();
+        this.writeDirectory = new RAMDirectory();
+        initWriter();
+    }
+
+    public void init() throws IOException {
+        if (writer != null) {
+            writer.close();
+        }
+        initWriter();
+        if (reader != null) {
+            reader.close();
+        }
+        this.reader = DirectoryReader.open(readDirectory);
+        this.searcher = new IndexSearcher(reader);
+    }
+
+    public void initWriter() throws IOException {
+        this.writer = new IndexWriter(writeDirectory, config());
+        //pre touch
+        writer.commit();
+        writer.flush();
+    }
+
+
+    public void swap() throws IOException {
+        Directory tmp = writeDirectory;
+        writeDirectory = readDirectory;
+        readDirectory = tmp;
+        init();
+    }
+
 
     public void storeGroups(Collection<Group> groups) throws IOException {
         writer.addDocuments(groups.stream()
                 .map(group -> create(group.getId(), group.getName(), SearchResultType.GROUP))
                 .collect(Collectors.toList()));
         writer.commit();
-
         writer.flush();
     }
 
@@ -77,8 +120,8 @@ public class Storage {
 
     public List<SearchResult> search(String text) {
         try {
-            this.searcher = new IndexSearcher(reader);
-            this.reader = DirectoryReader.open(directory);
+//            this.reader = DirectoryReader.open(readDirectory);
+//            this.searcher = new IndexSearcher(reader);
 
             Query query = queryParser.parse(text);
             TopDocs search = searcher.search(query, 1000);

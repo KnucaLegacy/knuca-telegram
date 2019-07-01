@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import com.google.common.collect.ImmutableMap;
 import com.theopus.entity.schedule.Group;
 import com.theopus.entity.schedule.Lesson;
 import com.theopus.entity.schedule.Room;
@@ -16,134 +17,65 @@ import com.theopus.schedule.backend.repository.Repository;
 
 public class LessonService {
 
-    private LessonRepository lessonRepo;
-    private Repository<Room> roomRepo;
-    private Repository<Group> groupRepo;
-    private Repository<Teacher> teacherRepo;
+    private Map<Class<?>, Repository<?>> repos;
+    private Map<Class<?>, LessonRepository<?>> lessonRepos;
 
-    public LessonService(LessonRepository lessonRepo, Repository<Room> roomRepo, Repository<Group> groupRepo, Repository<Teacher> teacherRepo) {
-        this.lessonRepo = lessonRepo;
-        this.roomRepo = roomRepo;
-        this.groupRepo = groupRepo;
-        this.teacherRepo = teacherRepo;
+    public LessonService(Repository<Room> roomRepo, Repository<Group> groupRepo, Repository<Teacher> teacherRepo,
+                         LessonRepository<Room> roomLessonRepo, LessonRepository<Group> groupLessonRepo, LessonRepository<Teacher> teacherLessonRepo) {
+        this.repos = ImmutableMap.of(
+                Group.class, groupRepo,
+                Teacher.class, teacherRepo,
+                Room.class, roomRepo);
+        this.lessonRepos = ImmutableMap.of(
+                Group.class, groupLessonRepo,
+                Teacher.class, teacherLessonRepo,
+                Room.class, roomLessonRepo);
     }
 
-    public ImmutablePair<Group, Map<LocalDate, List<Lesson>>> withGroup(Long id, LocalDate from, LocalDate to) {
-        Group group = groupRepo.get(id);
+    public <T> ImmutablePair<T, Map<LocalDate, List<Lesson>>> range(Long id, LocalDate from, LocalDate to, Class<T> type) {
+        T t = getRepo(type).get(id);
+        if (t == null) {
+            return ImmutablePair.of(null, null);
+        }
+        return ImmutablePair.of(t, getLessonRepo(type).range(t, from, to));
+    }
+
+    public <T> ImmutablePair<T, List<Lesson>> at(Long id, LocalDate date, Class<T> type) {
+        T group = getRepo(type).get(id);
         if (group == null) {
             return ImmutablePair.of(null, null);
         }
-        return ImmutablePair.of(group, lessonRepo.byGroup(group, from, to));
+        return ImmutablePair.of(group, getLessonRepo(type).at(group, date));
     }
 
-    public ImmutablePair<Group, List<Lesson>> withGroup(Long id, LocalDate date) {
-        Group group = groupRepo.get(id);
-        if (group == null) {
-            return ImmutablePair.of(null, null);
-        }
-        return ImmutablePair.of(group, lessonRepo.byGroup(group, date));
-    }
-
-    public ImmutablePair<Group, Map<LocalDate, List<Lesson>>> withGroupWeek(Long id, LocalDate date) {
-        Group group = groupRepo.get(id);
+    public <T> ImmutablePair<T, Map<LocalDate, List<Lesson>>> week(Long id, LocalDate date, Class<T> type) {
+        T group = getRepo(type).get(id);
         if (group == null) {
             return ImmutablePair.of(null, null);
         }
         ImmutablePair<LocalDate, LocalDate> pair = weekFromTo(date);
-        return ImmutablePair.of(group, lessonRepo.byGroup(group, pair.left, pair.right));
+        return ImmutablePair.of(group, getLessonRepo(type).range(group, pair.left, pair.right));
     }
 
-    public ImmutablePair<Group, Map<LocalDate, List<Lesson>>> withGroupWeek(Long id, int offset) {
-        Group group = groupRepo.get(id);
+    public <T> ImmutablePair<T, Map<LocalDate, List<Lesson>>> week(Long id, int offset, Class<T> type) {
+        T group = getRepo(type).get(id);
         if (group == null) {
             return ImmutablePair.of(null, null);
         }
         ImmutablePair<LocalDate, LocalDate> pair = weekFromTo(LocalDate.now(), offset);
-        return ImmutablePair.of(group, lessonRepo.byGroup(group, pair.left, pair.right));
+        return ImmutablePair.of(group, getLessonRepo(type).range(group, pair.left, pair.right));
     }
 
-    public ImmutablePair<Group, Map<LocalDate, List<Lesson>>> withGroupWeek(Long id) {
-        return withGroupWeek(id, LocalDate.now());
+    public <T>ImmutablePair<T, Map<LocalDate, List<Lesson>>> week(Long id, Class<T> type) {
+        return week(id, LocalDate.now(), type);
     }
 
-    public ImmutablePair<Teacher, Map<LocalDate, List<Lesson>>> withTeacher(Long id, LocalDate from, LocalDate to) {
-        Teacher teacher = teacherRepo.get(id);
-        if (teacher == null) {
-            return ImmutablePair.of(null, null);
-        }
-        return ImmutablePair.of(teacher, lessonRepo.byTeacher(teacher, from, to));
+    private <T> Repository<T> getRepo(Class<T> type) {
+        return (Repository<T>) repos.get(type);
     }
 
-    public ImmutablePair<Teacher, List<Lesson>> withTeacher(Long id, LocalDate date) {
-        Teacher teacher = teacherRepo.get(id);
-        if (teacher == null) {
-            return ImmutablePair.of(null, null);
-        }
-        return ImmutablePair.of(teacher, lessonRepo.byTeacher(teacher, date));
-    }
-
-    public ImmutablePair<Teacher, Map<LocalDate, List<Lesson>>> withTeacherWeek(Long id, LocalDate date) {
-        Teacher teacher = teacherRepo.get(id);
-        if (teacher == null) {
-            return ImmutablePair.of(null, null);
-        }
-        ImmutablePair<LocalDate, LocalDate> pair = weekFromTo(date);
-        return ImmutablePair.of(teacher, lessonRepo.byTeacher(teacher, pair.left, pair.right));
-    }
-
-    public ImmutablePair<Teacher, Map<LocalDate, List<Lesson>>> withTeacherWeek(Long id, int offset) {
-        Teacher teacher = teacherRepo.get(id);
-        if (teacher == null) {
-            return ImmutablePair.of(null, null);
-        }
-        ImmutablePair<LocalDate, LocalDate> pair = weekFromTo(LocalDate.now(), offset);
-        return ImmutablePair.of(teacher, lessonRepo.byTeacher(teacher, pair.left, pair.right));
-    }
-
-    public ImmutablePair<Teacher, Map<LocalDate, List<Lesson>>> withTeacherWeek(Long id) {
-        return withTeacherWeek(id, LocalDate.now());
-    }
-
-    public ImmutablePair<Room, Map<LocalDate, List<Lesson>>> withRoom(Long id, LocalDate from, LocalDate to) {
-        Room room = roomRepo.get(id);
-        if (room == null) {
-            return ImmutablePair.of(null, null);
-        }
-        return ImmutablePair.of(room, lessonRepo.byRoom(room, from, to));
-    }
-
-    public ImmutablePair<Room, List<Lesson>> withRoom(Long id, LocalDate date) {
-        Room room = roomRepo.get(id);
-        if (room == null) {
-            return ImmutablePair.of(null, null);
-        }
-        return ImmutablePair.of(room, lessonRepo.byRoom(room, date));
-    }
-
-    public ImmutablePair<Room, Map<LocalDate, List<Lesson>>> withRoomWeek(Long id, LocalDate date) {
-        Room room = roomRepo.get(id);
-        if (room == null) {
-            return ImmutablePair.of(null, null);
-        }
-        ImmutablePair<LocalDate, LocalDate> pair = weekFromTo(date);
-        return ImmutablePair.of(room, lessonRepo.byRoom(room, pair.left, pair.right));
-    }
-
-    public ImmutablePair<Room, Map<LocalDate, List<Lesson>>> withRoomWeek(Long id, int offset) {
-        Room room = roomRepo.get(id);
-        if (room == null) {
-            return ImmutablePair.of(null, null);
-        }
-        ImmutablePair<LocalDate, LocalDate> pair = weekFromTo(LocalDate.now(), offset);
-        return ImmutablePair.of(room, lessonRepo.byRoom(room, pair.left, pair.right));
-    }
-
-    public ImmutablePair<Room, Map<LocalDate, List<Lesson>>> withRoomWeek(Long id) {
-        return withRoomWeek(id, LocalDate.now());
-    }
-
-    private static ImmutablePair<LocalDate, LocalDate> weekFromTo() {
-        return weekFromTo(LocalDate.now(), 0);
+    private <T> LessonRepository<T> getLessonRepo(Class<T> type) {
+        return (LessonRepository<T>) lessonRepos.get(type);
     }
 
     private static ImmutablePair<LocalDate, LocalDate> weekFromTo(LocalDate localDate) {

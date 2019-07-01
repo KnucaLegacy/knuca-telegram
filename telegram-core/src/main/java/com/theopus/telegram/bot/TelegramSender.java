@@ -28,17 +28,17 @@ public class TelegramSender {
     }
 
     private void sendOne(Bot bot, TelegramRequest req, TelegramResponse res) throws TelegramApiException {
+        SendMessage msg = new SendMessage();
+        msg.setChatId(req.getChat().getId());
         if (res.getBody() != null && !res.getBody().isEmpty()) {
-            SendMessage msg = new SendMessage();
             if (res.withMarkup()) {
                 msg.setParseMode("HTML");
             }
-            msg.setChatId(req.getChat().getId());
             msg.setText(res.getBody());
-            bot.execute(msg);
+        } else {
+            return;
         }
         if (!res.getButtons().isEmpty()) {
-            SendMessage msg = new SendMessage();
             msg.setChatId(req.getChat().getId());
             InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
             List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -55,12 +55,10 @@ public class TelegramSender {
                 }
                 row.add(button);
             }
-
             keyboardMarkup.setKeyboard(keyboard);
             msg.setReplyMarkup(keyboardMarkup);
-            msg.setText("Выбери карту:");
-            bot.execute(msg);
         }
+        bot.execute(msg);
     }
 
 }

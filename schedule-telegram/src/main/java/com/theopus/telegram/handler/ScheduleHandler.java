@@ -1,18 +1,17 @@
 package com.theopus.telegram.handler;
 
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import com.theopus.entity.schedule.Group;
 import com.theopus.entity.schedule.Lesson;
-import com.theopus.entity.schedule.Room;
 import com.theopus.entity.schedule.Teacher;
-import com.theopus.schedule.backend.repository.LessonRepository;
 import com.theopus.schedule.backend.service.LessonService;
 import com.theopus.telegram.FormatManager;
 import com.theopus.telegram.TelegramSerDe;
@@ -27,6 +26,20 @@ public class ScheduleHandler implements TelegramHandler {
     private TelegramSerDe serDe;
     private final LessonService service;
     private final FormatManager formatManager;
+    public static final ButtonGenerator<ScheduleCommandData> generator = new ButtonGenerator<ScheduleCommandData>() {
+
+        @Override
+        public InlineKeyboardButton generate(TelegramSerDe serDe, FormatManager formatManager, ScheduleCommandData commandData) {
+            return new InlineKeyboardButton(formatManager.format(commandData.getAction()))
+                    .setCallbackData(serDe.serializeForCommand(COMMAND, commandData));
+        }
+
+        @Override
+        public InlineKeyboardButton generate(TelegramSerDe serDe, FormatManager formatManager, ScheduleCommandData commandData, String text) {
+            return new InlineKeyboardButton(text)
+                    .setCallbackData(serDe.serializeForCommand(COMMAND, commandData));
+        }
+    };
 
     public ScheduleHandler(TelegramSerDe serDe, LessonService service, FormatManager formatManager) {
         this.serDe = serDe;
@@ -45,30 +58,32 @@ public class ScheduleHandler implements TelegramHandler {
     }
 
     private TelegramResponse handle(ScheduleCommandData command) {
-        LocalDate from = LocalDate.of(2019, 04, 20);
-        LocalDate to = LocalDate.of(2019, 04, 30);
-
-
-
-
-
+        ImmutablePair<String, Map<LocalDate, List<Lesson>>> result = ScheduleHandlerHelper.getFor(command).apply(command.getId(), service);
         TelegramResponse response = new TelegramResponse();
-        appdendSchedule(response, title, lessons);
-        appdendButtons(response, command);
+        if (result.left == null || result.left.isEmpty()) {
+            return response;
+        }
+        if (result.right.isEmpty()) {
+
+        } else {
+            appdendSchedule(response, result.left, result.right);
+        }
+        appdendButtons(response, command, result.left);
         return response.head();
     }
 
-    private ImmutablePair<String, Map<LocalDate, List<Lesson>>> getLessons(ScheduleCommandData commandData){
-        Object query = service.query();
-        switch (commandData.getType()){
-            case GROUP:
-            case TEACHER:
-            case ROOM:
-        }
-    }
 
-    private void appdendButtons(TelegramResponse response, ScheduleCommandData command) {
-
+    private void appdendButtons(TelegramResponse response, ScheduleCommandData command, String title) {
+        response.addButtons(Arrays.asList(
+                generator.generate(serDe, formatManager, new ScheduleCommandData(command.getId(), command.getType(),
+                        ScheduleCommandData.Action.TODAY)),
+                generator.generate(serDe, formatManager, new ScheduleCommandData(command.getId(), command.getType(),
+                        ScheduleCommandData.Action.TOMORROW)),
+                generator.generate(serDe, formatManager, new ScheduleCommandData(command.getId(), command.getType(),
+                        ScheduleCommandData.Action.WEEK)),
+                generator.generate(serDe, formatManager, new ScheduleCommandData(command.getId(), command.getType(),
+                        ScheduleCommandData.Action.NEXT_WEEK))
+        ));
     }
 
     private final String headerTemplate = "" +
@@ -100,7 +115,7 @@ public class ScheduleHandler implements TelegramHandler {
                     //second
                     lesson.getCourse().getSubject().getName(),
                     //third
-                    lesson.getRooms().stream().map(Room::getName).collect(Collectors.joining(", ")),
+                    formatManager.format(lesson.getRooms()),
                     lesson.getCourse().getTeachers().stream().map(Teacher::getName).collect(Collectors.joining(",")),
                     //fourth
                     lesson.getGroups().stream().map(Group::getName).collect(Collectors.joining(", "))));

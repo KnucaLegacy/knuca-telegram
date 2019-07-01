@@ -15,12 +15,14 @@ import org.springframework.core.io.Resource;
 import com.theopus.entity.schedule.Group;
 import com.theopus.entity.schedule.Room;
 import com.theopus.entity.schedule.Teacher;
-import com.theopus.schedule.backend.repository.JdbcLessonsRepository;
+import com.theopus.schedule.backend.repository.JdbcGroupLessonRepository;
 import com.theopus.schedule.backend.repository.JdbcRepositoryGroups;
 import com.theopus.schedule.backend.repository.JdbcRepositoryRoom;
 import com.theopus.schedule.backend.repository.JdbcRepositoryTeachers;
-import com.theopus.schedule.backend.repository.LessonRepository;
+import com.theopus.schedule.backend.repository.JdbcRoomLessonRepository;
+import com.theopus.schedule.backend.repository.JdbcTeacherLessonRepository;
 import com.theopus.schedule.backend.repository.Repository;
+import com.theopus.schedule.backend.service.LessonService;
 
 @Configuration
 public class RepositoryConfiguration {
@@ -89,11 +91,12 @@ public class RepositoryConfiguration {
     }
 
     @Bean
-    public LessonRepository lessonsRepository(DataSource dataSource) throws IOException {
-        return new JdbcLessonsRepository(dataSource,
-                fileToString(lessonsByGroupQueryFile),
-                fileToString(lessonsByRoomQueryFile),
-                fileToString(lessonsByTeacherQueryFile)
+    public LessonService lessonService(Repository<Room> roomRepo, Repository<Group> groupRepo, Repository<Teacher> teacherRepo,
+                                       DataSource dataSource) throws IOException {
+        return new LessonService(roomRepo, groupRepo, teacherRepo,
+                new JdbcRoomLessonRepository(dataSource, fileToString(lessonsByRoomQueryFile)),
+                new JdbcGroupLessonRepository(dataSource, fileToString(lessonsByGroupQueryFile)),
+                new JdbcTeacherLessonRepository(dataSource, fileToString(lessonsByTeacherQueryFile))
         );
     }
 

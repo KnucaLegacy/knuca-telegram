@@ -22,7 +22,7 @@ public class ScheduleHandlerHelper {
     private static ImmutableMap<ImmutablePair<Action, Type>, ScheduleFunction> choices = new ImmutableMap.Builder()
             .put(p(Action.TODAY, Type.GROUP), (ScheduleFunction) (id, service) -> {
                 LocalDate now = getNow();
-                ImmutablePair<Group, List<Lesson>> response = service.withGroup(id, now);
+                ImmutablePair<Group, List<Lesson>> response = service.at(id, now, Group.class);
                 if (response.left != null) {
                     return ImmutablePair.of(response.left.getName(), ImmutableMap.of(now, response.right));
                 }
@@ -30,7 +30,7 @@ public class ScheduleHandlerHelper {
             })
             .put(p(Action.TODAY, Type.TEACHER), (ScheduleFunction) (id, service) -> {
                 LocalDate now = getNow();
-                ImmutablePair<Teacher, List<Lesson>> response = service.withTeacher(id, now);
+                ImmutablePair<Teacher, List<Lesson>> response = service.at(id, now, Teacher.class);
                 if (response.left != null) {
                     return ImmutablePair.of(response.left.getName(), ImmutableMap.of(now, response.right));
                 }
@@ -38,7 +38,7 @@ public class ScheduleHandlerHelper {
             })
             .put(p(Action.TODAY, Type.ROOM), (ScheduleFunction) (id, service) -> {
                 LocalDate now = getNow();
-                ImmutablePair<Room, List<Lesson>> response = service.withRoom(id, now);
+                ImmutablePair<Room, List<Lesson>> response = service.at(id, now, Room.class);
                 if (response.left != null) {
                     return ImmutablePair.of(response.left.getName(), ImmutableMap.of(now, response.right));
                 }
@@ -46,7 +46,7 @@ public class ScheduleHandlerHelper {
             })
             .put(p(Action.TOMORROW, Type.GROUP), (ScheduleFunction) (id, service) -> {
                 LocalDate now = getNow().plusDays(1);
-                ImmutablePair<Group, List<Lesson>> response = service.withGroup(id, now);
+                ImmutablePair<Group, List<Lesson>> response = service.at(id, now, Group.class);
                 if (response.left != null) {
                     return ImmutablePair.of(response.left.getName(), ImmutableMap.of(now, response.right));
                 }
@@ -55,7 +55,7 @@ public class ScheduleHandlerHelper {
             .put(p(Action.TOMORROW, Type.TEACHER), (ScheduleFunction) (id, service) -> {
                 LocalDate now = getNow().plusDays(1);
                 ;
-                ImmutablePair<Teacher, List<Lesson>> response = service.withTeacher(id, now);
+                ImmutablePair<Teacher, List<Lesson>> response = service.at(id, now, Teacher.class);
                 if (response.left != null) {
                     return ImmutablePair.of(response.left.getName(), ImmutableMap.of(now, response.right));
                 }
@@ -64,28 +64,28 @@ public class ScheduleHandlerHelper {
             .put(p(Action.TOMORROW, Type.ROOM), (ScheduleFunction) (id, service) -> {
                 LocalDate now = getNow().plusDays(1);
                 ;
-                ImmutablePair<Room, List<Lesson>> response = service.withRoom(id, now);
+                ImmutablePair<Room, List<Lesson>> response = service.at(id, now, Room.class);
                 if (response.left != null) {
                     return ImmutablePair.of(response.left.getName(), ImmutableMap.of(now, response.right));
                 }
                 return ImmutablePair.of(null, null);
             })
             .put(p(Action.WEEK, Type.GROUP), (ScheduleFunction) (id, service) -> {
-                ImmutablePair<Group, Map<LocalDate, List<Lesson>>> response = service.withGroupWeek(id);
+                ImmutablePair<Group, Map<LocalDate, List<Lesson>>> response = service.week(id, getNow(), Group.class);
                 if (response.left != null) {
                     return ImmutablePair.of(response.left.getName(), response.right);
                 }
                 return ImmutablePair.of(null, null);
             })
             .put(p(Action.WEEK, Type.TEACHER), (ScheduleFunction) (id, service) -> {
-                ImmutablePair<Teacher, Map<LocalDate, List<Lesson>>> response = service.withTeacherWeek(id);
+                ImmutablePair<Teacher, Map<LocalDate, List<Lesson>>> response = service.week(id, getNow(), Teacher.class);
                 if (response.left != null) {
                     return ImmutablePair.of(response.left.getName(), response.right);
                 }
                 return ImmutablePair.of(null, null);
             })
             .put(p(Action.WEEK, Type.ROOM), (ScheduleFunction) (id, service) -> {
-                ImmutablePair<Room, Map<LocalDate, List<Lesson>>> response = service.withRoomWeek(id);
+                ImmutablePair<Room, Map<LocalDate, List<Lesson>>> response = service.week(id, getNow(), Room.class);
                 if (response.left != null) {
                     return ImmutablePair.of(response.left.getName(), response.right);
                 }
@@ -94,7 +94,8 @@ public class ScheduleHandlerHelper {
             .build();
 
     private static LocalDate getNow() {
-        return LocalDate.of(2019, 4, 22);
+//        return LocalDate.of(2019, 4, 22);
+        return LocalDate.now();
     }
 
     public static ScheduleFunction getFor(ScheduleCommandData commandData) {
@@ -106,8 +107,7 @@ public class ScheduleHandlerHelper {
         return ImmutablePair.of(action, type);
     }
 
-    private interface ScheduleFunction extends BiFunction<Long, LessonService, ImmutablePair<String, Map<LocalDate, List<Lesson>>>> {
-
+    public interface ScheduleFunction extends BiFunction<Long, LessonService, ImmutablePair<String, Map<LocalDate, List<Lesson>>>> {
     }
 
 }

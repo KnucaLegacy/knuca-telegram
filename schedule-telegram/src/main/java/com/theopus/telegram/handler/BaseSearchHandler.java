@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import com.theopus.schedule.backend.search.Storage;
+import com.theopus.telegram.FormatManager;
 import com.theopus.telegram.TelegramSerDe;
 import com.theopus.telegram.bot.TelegramRequest;
 import com.theopus.telegram.bot.TelegramResponse;
@@ -16,10 +17,12 @@ public class BaseSearchHandler implements TelegramHandler {
 
     private final Storage storage;
     private final TelegramSerDe serDe;
+    private final FormatManager manager;
 
-    public BaseSearchHandler(Storage storage, TelegramSerDe serDe) {
+    public BaseSearchHandler(Storage storage, TelegramSerDe serDe, FormatManager manager) {
         this.storage = storage;
         this.serDe = serDe;
+        this.manager = manager;
     }
 
     @Override
@@ -30,10 +33,9 @@ public class BaseSearchHandler implements TelegramHandler {
         }
 
         return TelegramResponse.buttons(searchResult.stream()
-                .map(s -> new InlineKeyboardButton()
-                        .setText(s.name)
-                        .setCallbackData(serDe.serializeForCommand(ScheduleHandler.COMMAND, new ScheduleCommandData(s))))
-                .collect(Collectors.toList()));
+                .map(s -> ScheduleHandler.generator.generate(serDe, manager, new ScheduleCommandData(s), s.name))
+                .collect(Collectors.toList()))
+                .appendBold(req.getData() + ":");
     }
 
 }
