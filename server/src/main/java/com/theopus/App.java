@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
@@ -13,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @SpringBootApplication(scanBasePackages = "com.theopus.server.configuration",
-        exclude = DataSourceAutoConfiguration.class)
+        exclude = {DataSourceAutoConfiguration.class, WebMvcAutoConfiguration.class})
 public class App {
 
     public static void main(String[] args) {

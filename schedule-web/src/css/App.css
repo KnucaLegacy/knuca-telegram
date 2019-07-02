@@ -1,0 +1,149 @@
+.main-input input {
+  box-shadow: 0 5px 11px 0 rgba(0,0,0,.3), 0 4px 15px 0 rgba(0,0,0,.3);
+}
+
+/* Search result list */
+
+.search-result-list {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  max-height: 350px;
+  overflow-y: scroll;
+}
+
+/* Additional buttons */
+.table-buttons {
+  margin-bottom: 40px;
+}
+
+/* Text block */
+
+.text-block {
+  color: #fff;
+}
+
+.text-block h2 {
+  line-height: 40px;
+  font-size: 40px;
+  font-weight: 700;
+  white-space: nowrap;
+  margin-bottom: 21px;
+}
+
+.text-block p {
+  margin: 0;
+  line-height: 30px;
+  font-size: 30px;
+  font-weight: 400;
+}
+.text-block p:first-of-type {
+  margin-bottom: 5px;
+}
+
+.text-block span {
+  font-size: 16px;
+  font-weight: 400;
+  margin: 21px 0;
+}
+
+.text-block span {
+  display: block;
+}
+
+.text-block .text-block-link {
+  font-size: 14px;
+  font-weight: 400;
+  width: 150px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: #35acdf;
+}
+
+.text-block .text-block-link:hover {
+  background-color: #2e96c2
+}
+
+/* News  */
+.news-item {
+  position: relative;
+}
+
+.news-item.upper {
+  height: 522px;
+  padding-top: 8px;
+}
+
+.news-item.mid,
+.news-item.low {
+  margin-top: 270px;
+  height: 570px;
+}
+
+.news-item .upper-right picture {
+  bottom: 0;
+  position: absolute;
+}
+
+.news-item .upper-left picture {
+  top: 90px;
+  position: absolute;
+  box-shadow: 0 5px 11px 0 rgba(0,0,0,.3), 0 4px 15px 0 rgba(0,0,0,.3);
+}
+
+.news-item .mid-left picture {
+  top: 113px;
+  position: absolute;
+}
+
+.news-item .mid-right .text-block {
+  margin-top: 240px;
+  text-align: right;
+}
+
+.news-item .low-left .text-block {
+  margin-top: 200px;
+  text-align: left;
+}
+
+.news-item .low-left .text-block p {
+  margin-bottom: 8px;
+}
+
+.news-item .low-right picture {
+  position: absolute;
+  right: 0;
+}
+
+/* Footer */
+
+footer {
+  background-color: #151515;
+}
+
+.page-footer {
+  height: 100px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-credits picture {
+  margin-right: 16px;
+}
+
+.footer-contacts a {
+  filter: grayscale(1);
+}
+
+.footer-contacts a:hover {
+  filter: grayscale(0);
+}
+
+.footer-contacts span {
+  margin-right: 26px;
+}
+
+.footer-contacts a:last-child {
+  margin-left: 12px;
+}

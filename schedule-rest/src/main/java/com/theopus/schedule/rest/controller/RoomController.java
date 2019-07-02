@@ -14,7 +14,7 @@ import com.theopus.entity.schedule.Room;
 import com.theopus.schedule.backend.repository.Repository;
 
 @RestController
-@RequestMapping("/rooms")
+@RequestMapping("/api/rooms")
 public class RoomController {
 
     private Repository<Room> repository;

@@ -28,7 +28,7 @@ import com.theopus.schedule.backend.repository.Repository;
 import com.theopus.schedule.backend.service.LessonService;
 
 @RestController
-@RequestMapping("/lessons")
+@RequestMapping("/api/lessons")
 public class LessonController {
 
     private LessonService service;

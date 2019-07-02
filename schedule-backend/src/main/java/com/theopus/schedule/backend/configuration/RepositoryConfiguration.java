@@ -2,15 +2,14 @@ package com.theopus.schedule.backend.configuration;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.FileCopyUtils;
 
 import com.theopus.entity.schedule.Group;
 import com.theopus.entity.schedule.Room;
@@ -27,44 +26,42 @@ import com.theopus.schedule.backend.service.LessonService;
 @Configuration
 public class RepositoryConfiguration {
 
-    @Value("classpath:/dao/groups.sql")
-    private Resource allGroupQueryFile;
-    @Value("classpath:/dao/groups.by.id.sql")
-    private Resource groupByIdQueryFile;
-    @Value("classpath:/dao/rooms.sql")
-    private Resource allRoomQueryFile;
-    @Value("classpath:/dao/rooms.by.id.sql")
-    private Resource roomByIdQueryFile;
-    @Value("classpath:/dao/teachers.sql")
-    private Resource allTeachersQueryFile;
-    @Value("classpath:/dao/teachers.by.id.sql")
-    private Resource teacherByIdQueryFile;
-    @Value("classpath:/dao/group.lessons.sql")
-    private Resource lessonsByGroupQueryFile;
-    @Value("classpath:/dao/room.lessons.sql")
-    private Resource lessonsByRoomQueryFile;
-    @Value("classpath:/dao/teacher.lessons.sql")
-    private Resource lessonsByTeacherQueryFile;
+    @Value("/dao/groups.sql")
+    private String allGroupQueryFile;
+    @Value("/dao/groups.by.id.sql")
+    private String groupByIdQueryFile;
+    @Value("/dao/rooms.sql")
+    private String allRoomQueryFile;
+    @Value("/dao/rooms.by.id.sql")
+    private String roomByIdQueryFile;
+    @Value("/dao/teachers.sql")
+    private String allTeachersQueryFile;
+    @Value("/dao/teachers.by.id.sql")
+    private String teacherByIdQueryFile;
+    @Value("/dao/group.lessons.sql")
+    private String lessonsByGroupQueryFile;
+    @Value("/dao/room.lessons.sql")
+    private String lessonsByRoomQueryFile;
+    @Value("/dao/teacher.lessons.sql")
+    private String lessonsByTeacherQueryFile;
+    @Value("${spring.datasource.url}")
+    private String url;
+    @Value("${spring.datasource.username}")
+    private String username;
+    @Value("${spring.datasource.password}")
+    private String password;
 
     @Bean
     public DataSource dataSource() {
         org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
         dataSource.setDriverClassName("org.firebirdsql.jdbc.FBDriver");
-        dataSource.setUrl("jdbc:firebirdsql:localhost/3050:mkr");
-        dataSource.setUsername("OTKACHOV");
-        dataSource.setPassword("Fuffy-20-21");
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
         dataSource.setConnectionProperties("WireCrypt=Enabled");
         dataSource.setConnectionProperties("AuthServer=Srp,Legacy_Auth");
         dataSource.setInitialSize(1);
-//        dataSource.setMaxActive(4);
-//        dataSource.setMaxIdle(2);
-        try {
-            System.out.println(dataSource.getPassword());
-            System.out.println(dataSource.getUsername());
-            dataSource.getConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        dataSource.setMaxActive(4);
         return dataSource;
     }
 
@@ -86,8 +83,8 @@ public class RepositoryConfiguration {
         return new JdbcRepositoryRoom(dataSource, fileToString(allRoomQueryFile), fileToString(roomByIdQueryFile));
     }
 
-    private String fileToString(Resource resource) throws IOException {
-        return new String(Files.readAllBytes(resource.getFile().toPath()), StandardCharsets.UTF_8);
+    private String fileToString(String resource) throws IOException {
+        return new String(FileCopyUtils.copyToByteArray(new ClassPathResource(resource).getInputStream()), StandardCharsets.UTF_8);
     }
 
     @Bean

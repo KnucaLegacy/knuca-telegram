@@ -1,8 +1,9 @@
-rootProject.name = 'knuca-telegram'
+rootProject.name = 'knuca-schedule'
 include 'schedule-backend'
 include 'entity'
 include 'schedule-rest'
 include 'server'
 include 'telegram-core'
 include 'schedule-telegram'
+include 'schedule-web'
 

@@ -1,0 +1,29 @@
+#search-bg {
+    background: url('../img/xl/pattern.png') repeat;
+    background-size: 540px 480px;
+    min-height: 100vh;
+}
+
+.search-container {
+    margin-top: 30vh;
+}
+
+.news-container {
+    background: url('../img/xl/bg.png') no-repeat;
+    margin-top: -20px;
+    height: 2427px;
+}
+
+@media screen and (max-width: 529px) {
+    .news-container {
+        display: none;
+    }
+
+    .page-footer {
+        justify-content: center;
+    }
+    
+    .footer-contacts {
+        display: none;
+    }
+}

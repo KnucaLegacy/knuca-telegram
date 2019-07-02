@@ -64,7 +64,7 @@ public class ScheduleHandler implements TelegramHandler {
             return response;
         }
         if (result.right.isEmpty()) {
-
+            response.addBody("Нет пар");
         } else {
             appdendSchedule(response, result.left, result.right);
         }
@@ -72,17 +72,16 @@ public class ScheduleHandler implements TelegramHandler {
         return response.head();
     }
 
-
     private void appdendButtons(TelegramResponse response, ScheduleCommandData command, String title) {
         response.addButtons(Arrays.asList(
-                generator.generate(serDe, formatManager, new ScheduleCommandData(command.getId(), command.getType(),
-                        ScheduleCommandData.Action.TODAY)),
                 generator.generate(serDe, formatManager, new ScheduleCommandData(command.getId(), command.getType(),
                         ScheduleCommandData.Action.TOMORROW)),
                 generator.generate(serDe, formatManager, new ScheduleCommandData(command.getId(), command.getType(),
                         ScheduleCommandData.Action.WEEK)),
                 generator.generate(serDe, formatManager, new ScheduleCommandData(command.getId(), command.getType(),
-                        ScheduleCommandData.Action.NEXT_WEEK))
+                        ScheduleCommandData.Action.NEXT_WEEK)),
+                generator.generate(serDe, formatManager, new ScheduleCommandData(command.getId(), command.getType(),
+                        ScheduleCommandData.Action.TODAY))
         ));
     }
 

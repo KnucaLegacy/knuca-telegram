@@ -15,7 +15,7 @@ import com.theopus.schedule.backend.repository.Repository;
 
 
 @RestController
-@RequestMapping("/teachers")
+@RequestMapping("/api/teachers")
 public class TeacherController {
 
     private Repository<Teacher> repository;

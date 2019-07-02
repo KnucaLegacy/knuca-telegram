@@ -15,12 +15,15 @@ buildscript {
 
 plugins {
     id 'java'
+    id 'application'
 }
 
 group 'com.theopus'
 version '1.0-SNAPSHOT'
-
+mainClassName = "com.theopus.App"
 sourceCompatibility = 1.8
+
+
 
 repositories {
     mavenCentral()
@@ -28,7 +31,6 @@ repositories {
 
 subprojects {
     apply plugin: 'java'
-
     repositories {
         mavenCentral()
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
@@ -37,5 +39,37 @@ subprojects {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile project(":schedule-backend")
+    compile project(":schedule-rest")
+    compile project(":schedule-telegram")
+    compile project(":schedule-web")
+    compile project(":server")
+}
+
+distTar {
+    into("${project.name}-${version}/conf") {
+        from "server/src/main/resources/"
+        include "application.yml"
+        filter { it.replaceAll("classpath:", "../conf/") }
+        rename('application.yml', "config.yml")
+    }
+    into("${project.name}-${version}/lib") {
+        from "schedule-backend/src/main/resources/"
+        include "*"
+    }
+    compression = Compression.GZIP
+}
+
+task startScript(type: CreateStartScripts) {
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+    mainClassName = 'com.theopus.App'
+    applicationName = 'knuca-schedule'
+    defaultJvmOpts = ["-Xms64m", "-Xmx128m", "-Dspring.config.location=../conf/config.yml"]
+}
+
+applicationDistribution.into("bin") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(startScript)
+    fileMode = 0755
 }

@@ -16,7 +16,7 @@ import com.theopus.entity.schedule.Group;
 import com.theopus.schedule.backend.repository.Repository;
 
 @RestController
-@RequestMapping("/groups")
+@RequestMapping("/api/groups")
 public class GroupController {
 
     private static final Logger LOG = LoggerFactory.getLogger(GroupController.class);

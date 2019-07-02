@@ -7,13 +7,18 @@ server:
       idleTimeout: 30000
 spring:
   profiles:
-    active: rest-schedule, telegram-schedule
+    active: rest-schedule, telegram-schedule, web-schedule
   http:
     multipart:
       max-file-size: 64MB
       max-request-size: 64MB
+  datasource:
+    url: jdbc:firebirdsql:localhost/3050:mkr
+    username: "OTKACHOV"
+    password: "Fuffy-20-21"
 logging:
-  file: ../logs/knuca-rest.log
+  file: ../logs/knuca-schedule.log
+  level.org.springframework.web: INFO
 api:
   swagger:
     path: "/api/docs"

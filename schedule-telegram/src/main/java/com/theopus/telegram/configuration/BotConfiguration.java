@@ -1,10 +1,5 @@
 package com.theopus.telegram.configuration;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +34,6 @@ public class BotConfiguration {
         return new ObjectMapper();
     }
 
-
     @Bean
     public TelegramSerDe serDe(ObjectMapper mapper) {
         return new TelegramSerDe(mapper);
@@ -59,16 +53,8 @@ public class BotConfiguration {
     }
 
     @Bean
-    public ExecutorService scheduler(StorageUpdater updater) {
-        ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-        service.scheduleAtFixedRate(updater::process, 15, 15, TimeUnit.MINUTES);
-        return service;
-    }
-
-
-    @Bean
-    @DependsOn({"storageUpdater", "scheduler"})
-    public Bot bot(TelegramDispatcher dispatcher) {
+    @DependsOn({"storageUpdater"})
+    public Bot bot(StorageUpdater updater, TelegramDispatcher dispatcher) {
         Bot bot = new Bot(username, token, dispatcher);
         return bot;
     }

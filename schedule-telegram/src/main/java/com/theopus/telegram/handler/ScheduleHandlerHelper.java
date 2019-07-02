@@ -91,6 +91,27 @@ public class ScheduleHandlerHelper {
                 }
                 return ImmutablePair.of(null, null);
             })
+            .put(p(Action.NEXT_WEEK, Type.GROUP), (ScheduleFunction) (id, service) -> {
+                ImmutablePair<Group, Map<LocalDate, List<Lesson>>> response = service.week(id, getNow().plusDays(7), Group.class);
+                if (response.left != null) {
+                    return ImmutablePair.of(response.left.getName(), response.right);
+                }
+                return ImmutablePair.of(null, null);
+            })
+            .put(p(Action.NEXT_WEEK, Type.TEACHER), (ScheduleFunction) (id, service) -> {
+                ImmutablePair<Teacher, Map<LocalDate, List<Lesson>>> response = service.week(id, getNow().plusDays(7), Teacher.class);
+                if (response.left != null) {
+                    return ImmutablePair.of(response.left.getName(), response.right);
+                }
+                return ImmutablePair.of(null, null);
+            })
+            .put(p(Action.NEXT_WEEK, Type.ROOM), (ScheduleFunction) (id, service) -> {
+                ImmutablePair<Room, Map<LocalDate, List<Lesson>>> response = service.week(id, getNow().plusDays(7), Room.class);
+                if (response.left != null) {
+                    return ImmutablePair.of(response.left.getName(), response.right);
+                }
+                return ImmutablePair.of(null, null);
+            })
             .build();
 
     private static LocalDate getNow() {

@@ -1,2 +1,2 @@
-# knuca-telegram
+# knuca-schedule
 Next gen

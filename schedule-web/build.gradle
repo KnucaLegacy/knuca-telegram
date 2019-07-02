@@ -1,0 +1,37 @@
+plugins {
+    id "com.moowork.node" version "1.3.1"
+}
+
+configurations {
+    "default"
+}
+
+node {
+    // Version of node to use.
+    version = '9.7.1'
+
+    // Version of npm to use.
+    npmVersion = '6.4.1'
+
+    // Version of Yarn to use.
+    yarnVersion = '1.16.0'
+
+    // Base URL for fetching node distributions (change if you have a mirror).
+    distBaseUrl = 'https://nodejs.org/dist'
+
+    // If true, it will download node using above parameters.
+    // If false, it will try to use globally installed node.
+    download = true
+
+    // Set the work directory for unpacking node
+    workDir = file("${project.projectDir}/.nodejs")
+
+    // Set the work directory for NPM
+    npmWorkDir = file("${project.projectDir}/.npm")
+
+    // Set the work directory for Yarn
+    yarnWorkDir = file("${project.projectDir}/.yarn")
+
+    // Set the work directory where node_modules should be located
+    nodeModulesDir = file("${project.projectDir}")
+}
