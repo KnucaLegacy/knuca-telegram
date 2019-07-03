@@ -36,6 +36,12 @@ subprojects {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 
     }
+
+    compileJava.options.encoding = 'UTF-8'
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
 }
 
 dependencies {
@@ -64,7 +70,7 @@ task startScript(type: CreateStartScripts) {
     classpath = startScripts.classpath
     outputDir = startScripts.outputDir
     mainClassName = 'com.theopus.App'
-    applicationName = 'knuca-schedule'
+    applicationName = 'knuca-schedule-start'
     defaultJvmOpts = ["-Xms64m", "-Xmx128m", "-Dspring.config.location=../conf/config.yml"]
 }
 
@@ -72,4 +78,21 @@ applicationDistribution.into("bin") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(startScript)
     fileMode = 0755
+}
+
+startScripts {
+    doLast {
+        windowsScript.delete()
+        unixScript.delete()
+    }
+}
+
+task copyDistribution (type: Copy){
+    from distTar
+    into file("docker/")
+    rename("${project.name}-${version}.tgz", "knuca-schedule.tgz")
+}
+
+build.finalizedBy {
+    copyDistribution
 }

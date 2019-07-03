@@ -7,7 +7,7 @@ server:
       idleTimeout: 30000
 spring:
   profiles:
-    active: rest-schedule, telegram-schedule, web-schedule
+    include: rest-schedule, telegram-schedule, web-schedule
   http:
     multipart:
       max-file-size: 64MB
@@ -25,3 +25,21 @@ api:
     basePackage: "com.theopus"
 telegram.bot.username: "KNUCA_InfoBot"
 telegram.bot.token: "395659381:AAGf6YTIAEgwNYeTjrSRPPeSnUGEZLEU81s"
+
+---
+spring:
+  profiles: prod
+  datasource:
+    url: jdbc:firebirdsql:194.28.103.11/3050:mkr
+
+---
+spring:
+  profiles: local
+  datasource:
+    url: jdbc:firebirdsql:localhost/3050:mkr
+
+---
+spring:
+  profiles: win-docker
+  datasource:
+    url: jdbc:firebirdsql:host.docker.internal/3050:mkr

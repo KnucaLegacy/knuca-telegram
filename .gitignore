@@ -31,6 +31,9 @@ build/
 *.jar
 *.war
 *.ear
+*.tgz
+*.tar
+*.tar.gz
 /build
 /logs
 /build/

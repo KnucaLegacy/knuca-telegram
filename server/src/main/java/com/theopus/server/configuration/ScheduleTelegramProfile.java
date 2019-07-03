@@ -18,7 +18,8 @@ import com.theopus.telegram.configuration.TelegramBotAutoConfiguration;
 @Import({BotConfiguration.class, TelegramBotAutoConfiguration.class})
 @Profile("telegram-schedule")
 public class ScheduleTelegramProfile {
-    @Bean
+
+    @Bean(destroyMethod = "shutdownNow")
     public ExecutorService scheduler(StorageUpdater updater) {
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.scheduleAtFixedRate(updater::process, 15, 15, TimeUnit.MINUTES);
