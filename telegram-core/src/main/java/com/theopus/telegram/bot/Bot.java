@@ -3,6 +3,10 @@ package com.theopus.telegram.bot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -14,11 +18,13 @@ public class Bot extends TelegramLongPollingBot {
     private final String botUsername;
     private final String botToken;
     private TelegramDispatcher dispatcher;
+    private final MessageSender sender;
 
-    public Bot(String botUsername, String botToken, TelegramDispatcher dispatcher) {
+    public Bot(String botUsername, String botToken, TelegramDispatcher dispatcher, MessageSender sender) {
         this.botUsername = botUsername;
         this.botToken = botToken;
         this.dispatcher = dispatcher;
+        this.sender = sender;
     }
 
     @Override
@@ -45,6 +51,10 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             LOGGER.error("{}", e);
         }
+    }
+
+    public void sendAsync(BotApiMethod<?> msg) {
+        sender.sendAsync(this, msg);
     }
 
     @Override

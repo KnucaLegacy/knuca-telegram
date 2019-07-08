@@ -6,4 +6,6 @@ include 'server'
 include 'telegram-core'
 include 'schedule-telegram'
 include 'schedule-web'
+include 'telegram-backend'
+include 'telegram-rest'
 

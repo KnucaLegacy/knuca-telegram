@@ -1,0 +1,4 @@
+dependencies {
+    compile group: 'org.mapdb', name: 'mapdb', version: '3.0.7'
+    compile project(":telegram-core")
+}

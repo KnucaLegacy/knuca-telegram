@@ -7,7 +7,7 @@ server:
       idleTimeout: 30000
 spring:
   profiles:
-    include: rest-schedule, telegram-schedule, web-schedule
+    include: rest-schedule, telegram-schedule, web-schedule, telegram-rest
   http:
     multipart:
       max-file-size: 64MB
@@ -18,13 +18,17 @@ spring:
     password: "Fuffy-20-21"
 logging:
   file: ../logs/knuca-schedule.log
-  level.org.springframework.web: INFO
+  level.org.springframework.web: DEBUG
 api:
   swagger:
     path: "/api/docs"
     basePackage: "com.theopus"
-telegram.bot.username: "KNUCA_InfoBot"
-telegram.bot.token: "395659381:AAGf6YTIAEgwNYeTjrSRPPeSnUGEZLEU81s"
+telegram.bot:
+  username: "KNUCA_InfoBot"
+  token: "395659381:AAGf6YTIAEgwNYeTjrSRPPeSnUGEZLEU81s"
+  metrics.google.tag: "UA-112398090-1"
+  send.rate.per.sec: 29
+  db.file: "knuca-schedule.db"
 
 ---
 spring:

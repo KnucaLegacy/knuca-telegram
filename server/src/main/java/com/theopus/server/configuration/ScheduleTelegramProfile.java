@@ -11,11 +11,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 import com.theopus.schedule.backend.search.StorageUpdater;
-import com.theopus.telegram.configuration.BotConfiguration;
+import com.theopus.telegram.configuration.ScheduleBotConfiguration;
 import com.theopus.telegram.configuration.TelegramBotAutoConfiguration;
 
 @Configuration
-@Import({BotConfiguration.class, TelegramBotAutoConfiguration.class})
+@Import({ScheduleBotConfiguration.class, TelegramBotAutoConfiguration.class})
 @Profile("telegram-schedule")
 public class ScheduleTelegramProfile {
 

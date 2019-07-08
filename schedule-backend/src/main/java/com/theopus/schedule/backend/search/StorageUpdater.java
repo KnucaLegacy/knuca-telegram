@@ -42,7 +42,7 @@ public class StorageUpdater {
             storage.storeTeachers(teachersQ);
             LOGGER.info("Stored teachers.");
             List<Room> roomQ = rooms.all();
-            LOGGER.info("Queried teachers {}", roomQ.size());
+            LOGGER.info("Queried rooms {}", roomQ.size());
             storage.storeRooms(roomQ);
             LOGGER.info("Stored rooms.");
             LOGGER.info("Finished updating.");

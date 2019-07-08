@@ -1,0 +1,2 @@
+SELECT ka1 AS ID, ka2 AS NAME from KA
+WHERE 1=1

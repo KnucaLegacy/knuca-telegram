@@ -8,7 +8,6 @@ import java.util.Objects;
 
 public class Room {
 
-    public static final String NO_AUDITORY = "NO_AUDITORY";
     private Long id;
     private String name;
 

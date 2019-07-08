@@ -15,8 +15,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(404).body(ImmutablePair.of("error", ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {Exception.class})
-    protected ResponseEntity<Object> handleOtherExceptions(RuntimeException ex, WebRequest request) {
-        return ResponseEntity.status(500).body(ImmutablePair.of("error", ex.getMessage()));
-    }
+//    @ExceptionHandler(value = {Exception.class})
+//    protected ResponseEntity<Object> handleOtherExceptions(RuntimeException ex, WebRequest request) {
+//        return ResponseEntity.status(500).body(ImmutablePair.of("error", ex.getMessage()));
+//    }
 }

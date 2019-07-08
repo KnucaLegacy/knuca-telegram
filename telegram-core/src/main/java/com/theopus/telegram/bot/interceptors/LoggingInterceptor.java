@@ -11,12 +11,19 @@ public class LoggingInterceptor implements TelegramHandlerInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggingInterceptor.class);
 
     @Override
-    public void doBefore(TelegramRequest request) {
+    public boolean preHandle(TelegramRequest request) {
         LOGGER.info("Msg: {}, Chat: {}, From: {}", request.getOriginalMessage(), request.getChat().getId(), request.getFrom().getId());
+        LOGGER.info("Req: {}", request);
+        return true;
     }
 
     @Override
-    public void doAfter(TelegramRequest request, TelegramResponse response) {
+    public void postHandle(TelegramRequest request, TelegramResponse response) {
         LOGGER.info("Response: {}, To Chat: {}, Was From: {}", response, request.getChat().getId(), request.getFrom().getId());
+    }
+
+    @Override
+    public void afterCompleted(TelegramRequest request, TelegramResponse response) {
+
     }
 }

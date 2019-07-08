@@ -8,9 +8,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.theopus.entity.schedule.Building;
 import com.theopus.entity.schedule.Room;
 
-public class JdbcRepositoryRoom implements Repository<Room> {
+public class JdbcRepositoryRoom implements RoomRepository {
 
     private final JdbcTemplate template;
     private final String query;
@@ -27,6 +28,13 @@ public class JdbcRepositoryRoom implements Repository<Room> {
         return template.query(query, getRoomRowMapper());
     }
 
+    @Override
+    public List<Room> get(Building building) {
+        return template.query(query
+                        .concat(" AND KA1 = ?"), new Object[]{building.getId()},
+                getRoomRowMapper());
+    }
+
     private RowMapper<Room> getRoomRowMapper() {
         return (rs, rowNum) -> {
             Room room = new Room();
@@ -40,8 +48,7 @@ public class JdbcRepositoryRoom implements Repository<Room> {
     public Room get(Long id) {
         try {
             return template.queryForObject(queryById, new Object[]{id}, getRoomRowMapper());
-        }
-        catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }

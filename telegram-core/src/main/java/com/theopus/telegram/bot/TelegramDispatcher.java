@@ -13,7 +13,6 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.theopus.telegram.bot.handlers.TelegramHandler;
-import com.theopus.telegram.bot.interceptors.LoggingInterceptor;
 
 public class TelegramDispatcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(TelegramDispatcher.class);
@@ -22,12 +21,14 @@ public class TelegramDispatcher {
 
     private final Map<String, TelegramHandler> handlers;
     private final List<TelegramHandlerInterceptor> interceptors;
+    private final List<TelegramExceptionHandler> exceptionHandlers;
     private final TelegramSender sender;
 
     public TelegramDispatcher() {
         handlers = new HashMap<>();
         interceptors = new ArrayList<>();
         sender = new TelegramSender();
+        exceptionHandlers = new ArrayList<>();
     }
 
     public void dispatch(Bot bot, TelegramRequest req) throws TelegramApiException {
@@ -61,9 +62,24 @@ public class TelegramDispatcher {
             return;
         }
 
-        interceptors.forEach(ic -> ic.doBefore(req));
-        TelegramResponse res = handler.handle(req);
-        interceptors.forEach(ic -> ic.doAfter(req, res));
+        for (TelegramHandlerInterceptor interceptor : interceptors) {
+            if (!interceptor.preHandle(req)) {
+                LOGGER.warn("Broke chain by {}", interceptor);
+                return;
+            }
+        }
+
+        TelegramResponse res;
+        try {
+            res = handler.handle(req);
+        } catch (Exception e) {
+            exceptionHandlers.forEach(ex -> ex.handle(handler, req, e));
+            throw e;
+        }
+
+        for (TelegramHandlerInterceptor interceptor : interceptors) {
+            interceptor.postHandle(req, res);
+        }
 
         sender.send(bot, req, res);
     }
@@ -99,12 +115,16 @@ public class TelegramDispatcher {
             req.addMention(mention);
             mentionEnd = mentionMatcher.end();
         }
-        if (!containsCommand && mentionEnd != 0){
+        if (!containsCommand && mentionEnd != 0) {
             req.setData(req.getData().substring(mentionEnd).trim());
         }
     }
 
-    public void register(LoggingInterceptor loggingInterceptor) {
-        interceptors.add(loggingInterceptor);
+    public void register(TelegramHandlerInterceptor interceptor) {
+        interceptors.add(interceptor);
+    }
+
+    public void register(TelegramExceptionHandler handler) {
+        exceptionHandlers.add(handler);
     }
 }

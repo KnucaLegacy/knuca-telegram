@@ -11,9 +11,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
+import com.theopus.entity.schedule.Building;
+import com.theopus.entity.schedule.Faculty;
 import com.theopus.entity.schedule.Group;
 import com.theopus.entity.schedule.Room;
 import com.theopus.entity.schedule.Teacher;
+import com.theopus.schedule.backend.repository.DepartmentRepository;
+import com.theopus.schedule.backend.repository.GroupRepository;
+import com.theopus.schedule.backend.repository.JdbcBuildingRepository;
+import com.theopus.schedule.backend.repository.JdbcDepartmentRepository;
+import com.theopus.schedule.backend.repository.JdbcFacultyRepository;
 import com.theopus.schedule.backend.repository.JdbcGroupLessonRepository;
 import com.theopus.schedule.backend.repository.JdbcRepositoryGroups;
 import com.theopus.schedule.backend.repository.JdbcRepositoryRoom;
@@ -21,6 +28,8 @@ import com.theopus.schedule.backend.repository.JdbcRepositoryTeachers;
 import com.theopus.schedule.backend.repository.JdbcRoomLessonRepository;
 import com.theopus.schedule.backend.repository.JdbcTeacherLessonRepository;
 import com.theopus.schedule.backend.repository.Repository;
+import com.theopus.schedule.backend.repository.RoomRepository;
+import com.theopus.schedule.backend.repository.TeacherRepository;
 import com.theopus.schedule.backend.service.LessonService;
 
 @Configuration
@@ -30,6 +39,8 @@ public class RepositoryConfiguration {
     private String allGroupQueryFile;
     @Value("/dao/groups.by.id.sql")
     private String groupByIdQueryFile;
+    @Value("/dao/groups.by.faculty.and.course.sql")
+    private String queryByFacultyAndYos;
     @Value("/dao/rooms.sql")
     private String allRoomQueryFile;
     @Value("/dao/rooms.by.id.sql")
@@ -44,6 +55,12 @@ public class RepositoryConfiguration {
     private String lessonsByRoomQueryFile;
     @Value("/dao/teacher.lessons.sql")
     private String lessonsByTeacherQueryFile;
+    @Value("/dao/faculties.sql")
+    private String queryFaculties;
+    @Value("/dao/departmets.sql")
+    private String departmentsSql;
+    @Value("/dao/building.sql")
+    private String buildingsSql;
     @Value("${spring.datasource.url}")
     private String url;
     @Value("${spring.datasource.username}")
@@ -65,21 +82,32 @@ public class RepositoryConfiguration {
         return dataSource;
     }
 
-
     @Bean
-    public Repository<Group> groupRepo(DataSource dataSource) throws IOException {
-        return new JdbcRepositoryGroups(dataSource, fileToString(allGroupQueryFile), fileToString(groupByIdQueryFile));
+    public GroupRepository groupRepo(DataSource dataSource) throws IOException {
+        return new JdbcRepositoryGroups(dataSource, fileToString(allGroupQueryFile), fileToString(groupByIdQueryFile), fileToString(queryByFacultyAndYos));
     }
 
-
     @Bean
-    public Repository<Teacher> teacherRepo(DataSource dataSource) throws IOException {
+    public TeacherRepository teacherRepo(DataSource dataSource) throws IOException {
         return new JdbcRepositoryTeachers(dataSource, fileToString(allTeachersQueryFile), fileToString(teacherByIdQueryFile));
     }
-
+    @Bean
+    public DepartmentRepository departmentRepo(DataSource dataSource) throws IOException {
+        return new JdbcDepartmentRepository(dataSource, fileToString(departmentsSql));
+    }
 
     @Bean
-    public Repository<Room> roomRepo(DataSource dataSource) throws IOException {
+    public Repository<Faculty> facultyRepo(DataSource dataSource) throws IOException {
+        return new JdbcFacultyRepository(dataSource, fileToString(queryFaculties));
+    }
+
+    @Bean
+    public Repository<Building> buildingRepository(DataSource dataSource) throws IOException {
+        return new JdbcBuildingRepository(dataSource, fileToString(buildingsSql));
+    }
+
+    @Bean
+    public RoomRepository roomRepo(DataSource dataSource) throws IOException {
         return new JdbcRepositoryRoom(dataSource, fileToString(allRoomQueryFile), fileToString(roomByIdQueryFile));
     }
 

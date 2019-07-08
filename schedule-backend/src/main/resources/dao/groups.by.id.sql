@@ -25,6 +25,6 @@ SELECT ID, COURSE, NAME, SNAME from
 			WHERE ucxg1<30000 and gr13=0 and gr6 is null -- no idea wtf
 				 and sem3=:Y and ucgns5=:Y      --year
 				 and sem5=:S and ucgns6=:S       --semester
-				 and sp5 >= 2 and sp5 <=8      --faculty
+				 and sp5 >= 1 and sp5 <=8      --faculty
 				 and gr1=:ID
 			GROUP BY sg4, sem4, gr7,gr3,gr1, gr19,gr20,gr21,gr22,gr23,gr24,gr25,gr26, sp5, sem4)

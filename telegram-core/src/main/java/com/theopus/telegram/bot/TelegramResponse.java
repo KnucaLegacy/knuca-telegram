@@ -1,6 +1,7 @@
 package com.theopus.telegram.bot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -12,6 +13,7 @@ public class TelegramResponse {
     private boolean markup;
     private TelegramResponse next;
     private TelegramResponse head;
+    private boolean update;
 
     public TelegramResponse() {
         this.body = new StringBuilder();
@@ -33,6 +35,11 @@ public class TelegramResponse {
 
     public TelegramResponse addButtons(List<InlineKeyboardButton> buttons) {
         this.buttons.addAll(buttons);
+        return this;
+    }
+
+    public TelegramResponse addButtons(InlineKeyboardButton...buttons) {
+        this.buttons.addAll(Arrays.asList(buttons));
         return this;
     }
 
@@ -114,6 +121,13 @@ public class TelegramResponse {
         markup = true;
         return "<b>" + text + "</b>";
     }
+    public TelegramResponse update(){
+        this.update = true;
+        return this;
+    }
 
 
+    public boolean isUpdate() {
+        return update;
+    }
 }

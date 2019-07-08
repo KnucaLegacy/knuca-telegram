@@ -8,6 +8,7 @@ dependencies {
     compile project(":schedule-backend")
     compile project(":schedule-rest")
     compile project(":schedule-telegram")
+    compile project(":telegram-rest")
     compile("io.springfox:springfox-swagger2:2.6.1")
     compile("io.springfox:springfox-swagger-ui:2.6.1")
 //    compile("org.springframework.boot:spring-boot-devtools:${springBootVersion}")

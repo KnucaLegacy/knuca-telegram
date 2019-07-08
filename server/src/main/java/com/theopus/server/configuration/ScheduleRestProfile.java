@@ -1,6 +1,7 @@
 package com.theopus.server.configuration;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -11,6 +12,7 @@ import com.theopus.schedule.rest.configuration.ScheduleRestConfiguration;
 @EnableWebMvc
 @Import(ScheduleRestConfiguration.class)
 @Profile("rest-schedule")
+@DependsOn()
 public class ScheduleRestProfile {
 
 }

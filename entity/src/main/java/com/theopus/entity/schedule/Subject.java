@@ -12,8 +12,6 @@ public class Subject {
     private Long id;
     private String name;
 
-    private Set<Course> courses = new HashSet<>();
-
     public Subject() {
     }
 
@@ -44,18 +42,6 @@ public class Subject {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Course> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses;
     }
 
     @Override

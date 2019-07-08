@@ -15,7 +15,7 @@ import com.theopus.entity.schedule.Teacher;
 import com.theopus.schedule.backend.service.LessonService;
 import com.theopus.telegram.handler.entity.ScheduleCommandData;
 import com.theopus.telegram.handler.entity.ScheduleCommandData.Action;
-import com.theopus.telegram.handler.entity.ScheduleCommandData.Type;
+import com.theopus.telegram.handler.entity.Type;
 
 public class ScheduleHandlerHelper {
 

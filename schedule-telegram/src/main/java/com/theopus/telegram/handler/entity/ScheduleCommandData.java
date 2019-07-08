@@ -35,12 +35,6 @@ public class ScheduleCommandData {
         this.action = Action.values()[action];
     }
 
-    public enum Type {
-        TEACHER,
-        ROOM,
-        GROUP
-    }
-
     public enum Action {
         TODAY,
         TOMORROW,

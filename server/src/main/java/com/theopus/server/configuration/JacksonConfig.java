@@ -1,129 +1,51 @@
 package com.theopus.server.configuration;
 
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import com.theopus.entity.schedule.Group;
-import com.theopus.entity.schedule.Room;
-import com.theopus.entity.schedule.Subject;
-import com.theopus.entity.schedule.Teacher;
 
 @Configuration
-public class JacksonConfig {
+public class JacksonConfig extends WebMvcConfigurerAdapter {
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Bean
+    @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JSR310Module());
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
-        SimpleModule module = new SimpleModule("custom",
-                Version.unknownVersion());
-        module.addSerializer(Group.class, new GroupSerializer());
-        module.addSerializer(Teacher.class, new TeacherSerializer());
-        module.addSerializer(Room.class, new RoomSerializer());
-        module.addSerializer(Subject.class, new SubjectSerializer());
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        // or (for older versions):
-        module.addDeserializer(LocalDate.class, new MyLocalDateDeserializer());
-        mapper.registerModule(module);
+//        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        System.out.println(mapper);
         return mapper;
     }
 
-    public static class GroupSerializer extends JsonSerializer<Group> {
-        @Override
-        public void serialize(Group value, JsonGenerator jgen,
-                              SerializerProvider provider) throws IOException {
-            writeSimpleObj(jgen, value != null, value.getId(), value.getName());
-        }
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(new MappingJackson2HttpMessageConverter(mapper));
+        super.configureMessageConverters(converters);
     }
 
-    public static class TeacherSerializer extends JsonSerializer<Teacher> {
-        @Override
-        public void serialize(Teacher value, JsonGenerator jgen,
-                              SerializerProvider provider) throws IOException {
-            writeSimpleObj(jgen, value != null, value.getId(), value.getName());
-        }
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        DateTimeFormatterRegistrar registrar = new DateTimeFormatterRegistrar();
+        registrar.setUseIsoFormat(true);
+        registrar.registerFormatters(registry);
     }
-
-    public static class RoomSerializer extends JsonSerializer<Room> {
-        @Override
-        public void serialize(Room value, JsonGenerator jgen,
-                              SerializerProvider provider) throws IOException {
-            writeSimpleObj(jgen, value != null, value.getId(), value.getName());
-        }
-    }
-
-    public static class SubjectSerializer extends JsonSerializer<Subject> {
-        @Override
-        public void serialize(Subject value, JsonGenerator jgen,
-                              SerializerProvider provider) throws IOException {
-            writeSimpleObj(jgen, value != null, value.getId(), value.getName());
-        }
-
-
-    }
-
-    private static void writeSimpleObj(JsonGenerator jgen, boolean b, Long id, String name) throws IOException {
-        if (b) {
-            jgen.writeStartObject();
-            if (id != null) {
-                jgen.writeStringField("id", id.toString());
-            } else {
-                jgen.writeNullField("id");
-            }
-            if (name != null) {
-                jgen.writeStringField("name", name);
-            } else {
-                jgen.writeNullField("name");
-            }
-            jgen.writeEndObject();
-        }
-    }
-
-    public static class MyLocalDateDeserializer extends JsonDeserializer<LocalDate> {
-
-        @Override
-        public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-            return LocalDate.parse(p.getText());
-        }
-    }
-
-    @Bean
-    public DateTimeFormatConfiguration dateTimeFormatConfiguration() {
-        return new DateTimeFormatConfiguration();
-    }
-
-    public static class DateTimeFormatConfiguration extends WebMvcConfigurerAdapter {
-
-        @Override
-        public void addFormatters(FormatterRegistry registry) {
-            DateTimeFormatterRegistrar registrar = new DateTimeFormatterRegistrar();
-            registrar.setDateFormatter(DateTimeFormatter.ofPattern("yyyy-MM-d"));
-            registrar.registerFormatters(registry);
-        }
-    }
-
 }

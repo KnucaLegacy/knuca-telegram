@@ -8,9 +8,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.theopus.entity.schedule.Department;
 import com.theopus.entity.schedule.Teacher;
 
-public class JdbcRepositoryTeachers implements Repository<Teacher> {
+public class JdbcRepositoryTeachers implements TeacherRepository {
 
     private final JdbcTemplate template;
     private final String query;
@@ -36,6 +37,7 @@ public class JdbcRepositoryTeachers implements Repository<Teacher> {
         };
     }
 
+
     @Override
     public Teacher get(Long id) {
         try {
@@ -43,5 +45,13 @@ public class JdbcRepositoryTeachers implements Repository<Teacher> {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    //    PD4 - department
+    @Override
+    public List<Teacher> get(Department dept) {
+        return template.query(query
+                .concat(" AND PD4 = ?"), new Object[]{dept.getId()}, getTeacherRowMapper());
+
     }
 }
