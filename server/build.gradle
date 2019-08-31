@@ -26,4 +26,5 @@ task buildScheduleSpa(type: Copy) {
 
 jar.dependsOn buildScheduleSpa
 
+buildScheduleSpa.dependsOn project(':schedule-web').tasks.yarn
 buildScheduleSpa.dependsOn project(':schedule-web').tasks.yarn_build

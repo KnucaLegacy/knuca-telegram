@@ -15,6 +15,11 @@ public class TelegramResponse {
     private TelegramResponse head;
     private boolean update;
 
+    public TelegramResponse setMarkup(boolean markup) {
+        this.markup = markup;
+        return this;
+    }
+
     public TelegramResponse() {
         this.body = new StringBuilder();
         this.status = ResponseStatus.OK;

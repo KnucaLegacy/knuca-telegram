@@ -68,8 +68,8 @@ public class RepositoryConfiguration {
     @Value("${spring.datasource.password}")
     private String password;
 
-    @Bean
-    public DataSource dataSource() {
+    @Bean(destroyMethod = "close")
+    public org.apache.tomcat.jdbc.pool.DataSource tomcatDataSource(){
         org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
         dataSource.setDriverClassName("org.firebirdsql.jdbc.FBDriver");
         dataSource.setUrl(url);
@@ -78,7 +78,7 @@ public class RepositoryConfiguration {
         dataSource.setConnectionProperties("WireCrypt=Enabled");
         dataSource.setConnectionProperties("AuthServer=Srp,Legacy_Auth");
         dataSource.setInitialSize(1);
-        dataSource.setMaxActive(4);
+        dataSource.setMaxActive(2);
         return dataSource;
     }
 

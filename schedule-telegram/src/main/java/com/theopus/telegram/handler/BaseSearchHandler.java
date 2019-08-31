@@ -3,8 +3,6 @@ package com.theopus.telegram.handler;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-
 import com.theopus.schedule.backend.search.Storage;
 import com.theopus.telegram.FormatManager;
 import com.theopus.telegram.TelegramSerDe;
@@ -30,6 +28,12 @@ public class BaseSearchHandler implements TelegramHandler {
         List<Storage.SearchResult> searchResult = storage.search(req.getData());
         if (searchResult.isEmpty()) {
             return TelegramResponse.body("Не знаю что такое " + req.getData());
+        }
+        List<Storage.SearchResult> matchHit = searchResult.stream()
+                .filter(s -> s.name.toLowerCase().equals(req.getData().toLowerCase()))
+                .collect(Collectors.toList());
+        if (matchHit.size() == 1) {
+            searchResult = matchHit;
         }
 
         return TelegramResponse.buttons(searchResult.stream()

@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
@@ -12,7 +11,6 @@ import com.theopus.entity.schedule.Room;
 import com.theopus.entity.schedule.enums.LessonOrder;
 import com.theopus.entity.schedule.enums.LessonType;
 import com.theopus.telegram.handler.entity.ScheduleCommandData;
-import com.theopus.telegram.handler.entity.SearchCommand;
 import com.theopus.telegram.handler.entity.Type;
 
 public class FormatManager {
@@ -37,12 +35,13 @@ public class FormatManager {
             .put(LessonType.FACULTY, "Факультатив")
             .build();
 
-    private ImmutableMap<ScheduleCommandData.Action, String> actions = new ImmutableMap.Builder<ScheduleCommandData.Action, String>()
-            .put(ScheduleCommandData.Action.TODAY, "Сегодня")
-            .put(ScheduleCommandData.Action.TOMORROW, "Завтра")
-            .put(ScheduleCommandData.Action.WEEK, "Неделя")
-            .put(ScheduleCommandData.Action.NEXT_WEEK, "След. Неделя")
-            .build();
+    private ImmutableMap<ScheduleCommandData.Action, String> actions =
+            new ImmutableMap.Builder<ScheduleCommandData.Action, String>()
+                    .put(ScheduleCommandData.Action.TODAY, "Сегодня")
+                    .put(ScheduleCommandData.Action.TOMORROW, "Завтра")
+                    .put(ScheduleCommandData.Action.WEEK, "Неделя")
+                    .put(ScheduleCommandData.Action.NEXT_WEEK, "След. Неделя")
+                    .build();
 
     private ImmutableMap<Type, String> searchTypes = ImmutableMap.of(
             Type.GROUP, "Группа",
@@ -102,5 +101,20 @@ public class FormatManager {
 
     public String back() {
         return "<< Назад";
+    }
+
+    public String help() {
+        return
+                "Привет!\n"
+                        + "\n"
+                        + "Как получить расписание?\n"
+                        + "Просто напиши мне группу/преподавателя/аудиторию.\n"
+                        + "Или напиши команду /search и следуй меню!\n"
+                        + "Бот работает в конфах, так что можете доавлять его в беседы групп.\n"
+                        + "\n"
+                        + "Спасибо и удачи!"
+                        + "\n"
+                        + "Вопросы/предложения? Пиши <a href=\"tg://user?name=theopus5\">сюда</a>."
+                ;
     }
 }

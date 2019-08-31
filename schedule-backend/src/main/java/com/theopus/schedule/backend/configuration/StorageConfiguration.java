@@ -18,7 +18,7 @@ import com.theopus.schedule.backend.search.StorageUpdater;
 public class StorageConfiguration {
 
 
-    @Bean
+    @Bean(destroyMethod = "close")
     public Storage storage() throws IOException {
         return new Storage();
     }

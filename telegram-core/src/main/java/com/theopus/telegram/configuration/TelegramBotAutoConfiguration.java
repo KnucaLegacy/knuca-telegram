@@ -59,7 +59,8 @@ public class TelegramBotAutoConfiguration {
         });
     }
 
-    @PreDestroy
+    //deadlock
+    // @PreDestroy
     public void stop() {
         this.sessions.stream().forEach((session) -> {
             if (session != null) {

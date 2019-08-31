@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.theopus.schedule.backend.search.StorageUpdater;
 import com.theopus.telegram.configuration.ScheduleBotConfiguration;
 import com.theopus.telegram.configuration.TelegramBotAutoConfiguration;

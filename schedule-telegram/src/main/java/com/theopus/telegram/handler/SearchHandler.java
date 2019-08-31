@@ -21,7 +21,7 @@ public class SearchHandler implements TelegramHandler {
     private final TelegramSerDe serDe;
     private final FormatManager formatManager;
 
-    public SearchHandler(TelegramSerDe serDe,
+    public  SearchHandler(TelegramSerDe serDe,
                          FormatManager formatManager,
                          SearchCommandConfigurer configurer) {
         this.serDe = serDe;

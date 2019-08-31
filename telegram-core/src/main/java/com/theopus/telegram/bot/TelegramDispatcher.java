@@ -92,6 +92,10 @@ public class TelegramDispatcher {
         }
     }
 
+    public void register(String command, TelegramHandler handler) {
+        handlers.put(command, handler);
+    }
+
     public void extractInfo(TelegramRequest req) {
         String msg = req.getOriginalMessage();
         Matcher commandMatcher = commandPattern.matcher(msg);

@@ -2,6 +2,7 @@ package com.theopus.telegram.handler;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,13 +30,15 @@ public class ScheduleHandler implements TelegramHandler {
     public static final ButtonGenerator<ScheduleCommandData> generator = new ButtonGenerator<ScheduleCommandData>() {
 
         @Override
-        public InlineKeyboardButton generate(TelegramSerDe serDe, FormatManager formatManager, ScheduleCommandData commandData) {
+        public InlineKeyboardButton generate(TelegramSerDe serDe, FormatManager formatManager,
+                ScheduleCommandData commandData) {
             return new InlineKeyboardButton(formatManager.format(commandData.getAction()))
                     .setCallbackData(serDe.serializeForCommand(COMMAND, commandData));
         }
 
         @Override
-        public InlineKeyboardButton generate(TelegramSerDe serDe, FormatManager formatManager, ScheduleCommandData commandData, String text) {
+        public InlineKeyboardButton generate(TelegramSerDe serDe, FormatManager formatManager,
+                ScheduleCommandData commandData, String text) {
             return new InlineKeyboardButton(text)
                     .setCallbackData(serDe.serializeForCommand(COMMAND, commandData));
         }
@@ -58,7 +61,8 @@ public class ScheduleHandler implements TelegramHandler {
     }
 
     private TelegramResponse handle(ScheduleCommandData command) {
-        ImmutablePair<String, Map<LocalDate, List<Lesson>>> result = ScheduleHandlerHelper.getFor(command).apply(command.getId(), service);
+        ImmutablePair<String, Map<LocalDate, List<Lesson>>> result = ScheduleHandlerHelper.getFor(command).apply(
+                command.getId(), service);
         TelegramResponse response = new TelegramResponse();
         if (result.left == null || result.left.isEmpty()) {
             return response;
@@ -66,7 +70,7 @@ public class ScheduleHandler implements TelegramHandler {
         if (result.right.isEmpty()) {
             response.addBody("Нет пар");
         } else {
-            appdendSchedule(response, result.left, result.right);
+            response = appdendSchedule(response, result.left, result.right);
         }
         appdendButtons(response, command, result.left);
         return response.head();
@@ -95,14 +99,18 @@ public class ScheduleHandler implements TelegramHandler {
             "║%s║%s║\n" +
             "║%s║\n\n";
 
-    private void appdendSchedule(TelegramResponse response, String title, Map<LocalDate, List<Lesson>> lessons) {
-        for (Map.Entry<LocalDate, List<Lesson>> dateLessons : lessons.entrySet()) {
+    private TelegramResponse appdendSchedule(TelegramResponse response, String title,
+            Map<LocalDate, List<Lesson>> lessons) {
+        for (Map.Entry<LocalDate, List<Lesson>> dateLessons : lessons.entrySet().stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .collect(Collectors.toList())) {
+            response = response.append();
             response.addBody(String.format(headerTemplate,
                     response.getBold(title),
                     formatManager.formatWithDow(dateLessons.getKey())));
             setTable(response, dateLessons.getValue());
-            response = response.append();
         }
+        return response;
     }
 
     private void setTable(TelegramResponse response, List<Lesson> value) {

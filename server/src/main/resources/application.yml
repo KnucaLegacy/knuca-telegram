@@ -2,8 +2,8 @@ server:
   port: 8080
   jetty:
     threadPool:
-      maxThreads: 100
-      minThreads: 10
+      maxThreads: 16
+      minThreads: 4
       idleTimeout: 30000
 spring:
   profiles:
@@ -35,6 +35,9 @@ spring:
   profiles: prod
   datasource:
     url: jdbc:firebirdsql:194.28.103.11/3050:mkr
+  telegram.bot:
+    username: "KNUCA_ScheduleBot"
+    token: "400574726:AAE2Lw4vrqTiMm3IQZos7oDOyxNQ-FS9Juk"
 
 ---
 spring:

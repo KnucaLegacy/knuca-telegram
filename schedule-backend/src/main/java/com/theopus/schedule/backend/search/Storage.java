@@ -55,6 +55,14 @@ public class Storage {
         init();
     }
 
+    public void close() throws IOException {
+        writeDirectory.close();
+        readDirectory.close();
+        writer.close();
+        reader.close();
+        analyzer.close();
+    }
+
     private IndexWriterConfig config() {
         return new IndexWriterConfig(analyzer);
     }

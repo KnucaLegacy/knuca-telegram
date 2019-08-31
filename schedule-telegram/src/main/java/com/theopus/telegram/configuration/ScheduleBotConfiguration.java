@@ -30,6 +30,7 @@ import com.theopus.telegram.bot.handlers.EchoHandler;
 import com.theopus.telegram.bot.interceptors.LoggingInterceptor;
 import com.theopus.telegram.bot.interceptors.NotCommandCallbackInterceptor;
 import com.theopus.telegram.handler.BaseSearchHandler;
+import com.theopus.telegram.handler.HelloHandler;
 import com.theopus.telegram.handler.MetricsInterceptor;
 import com.theopus.telegram.handler.ScheduleHandler;
 import com.theopus.telegram.handler.SearchCommandConfigurer;
@@ -73,6 +74,10 @@ public class ScheduleBotConfiguration {
         telegramDispatcher.register(new UserMonitoringInterceptor(userRepository, chatRepository));
         telegramDispatcher.register(new ScheduleHandler(telegramSerDe, service, manager));
         telegramDispatcher.register(new SearchHandler(telegramSerDe, manager, commandConfigurer));
+        telegramDispatcher.register("hello", new HelloHandler(formatManager));
+        telegramDispatcher.register("help", new HelloHandler(formatManager));
+        telegramDispatcher.register("start", new HelloHandler(formatManager));
+        telegramDispatcher.register("init", new HelloHandler(formatManager));
         return telegramDispatcher;
     }
 
@@ -100,7 +105,7 @@ public class ScheduleBotConfiguration {
         return new GoogleMetricsService(metricsTag);
     }
 
-    @Bean
+    @Bean(destroyMethod = "onClosing")
     @DependsOn({"storageUpdater"})
     public Bot bot(StorageUpdater updater, TelegramDispatcher dispatcher, MessageSender sender) {
         Bot bot = new Bot(username, token, dispatcher, sender);

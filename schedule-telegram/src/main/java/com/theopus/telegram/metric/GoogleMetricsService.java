@@ -17,6 +17,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.theopus.telegram.bot.TelegramRequest;
 import com.theopus.telegram.bot.TelegramResponse;
 import com.theopus.telegram.bot.handlers.TelegramHandler;
@@ -30,7 +31,7 @@ public class GoogleMetricsService implements MetricService {
 
     public GoogleMetricsService(String appTag) {
         this.appTag = appTag;
-        executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("metrics-%d").build());
     }
 
     @Override
@@ -113,6 +114,6 @@ public class GoogleMetricsService implements MetricService {
     @Override
     public void close() throws InterruptedException {
         executor.shutdownNow();
-        executor.awaitTermination(5, TimeUnit.SECONDS);
+        executor.awaitTermination(1, TimeUnit.SECONDS);
     }
 }

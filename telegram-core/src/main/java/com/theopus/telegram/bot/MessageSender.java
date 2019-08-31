@@ -8,10 +8,10 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.google.common.util.concurrent.RateLimiter;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class MessageSender {
 
@@ -24,7 +24,7 @@ public class MessageSender {
     public MessageSender(int rate) {
         limiter = RateLimiter.create(rate);
         queue = new LinkedBlockingQueue<>();
-        executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("message-sender-%d").build());
         executor.execute(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 limiter.acquire();
@@ -53,6 +53,6 @@ public class MessageSender {
 
     public void close() throws InterruptedException {
         executor.shutdown();
-        executor.awaitTermination(5, TimeUnit.SECONDS);
+        executor.awaitTermination(1, TimeUnit.SECONDS);
     }
 }
